@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JAM Content Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/jpg" href="image.jpg">
+</head>
+<body>
+  <header>
+    <h1>JAM Content Hub</h1>
+    <p>Click a topic to view the script, then practise with the 1‑minute timer.</p>
+  </header>
+
+  <section class="controls">
+    <label for="searchInput" class="visually-hidden">Search topics</label>
+    <input id="searchInput" type="search" placeholder="Search topics..." />
+  </section>
+
+  <main>
+    <aside>
+      <ul id="scriptsList" aria-label="Scripts list"></ul>
+    </aside>
+
+    <section id="contentArea" aria-live="polite">
+      <h2 id="topicTitle" class="topic-title">Select a topic</h2>
+      <div id="scriptContent" class="topic-text">Choose a topic from the list to see the script here.</div>
+
+      <div id="timer" class="timer">
+        <button id="startTimerBtn">Start 1‑Minute Timer</button>
+        <div id="countdown" aria-atomic="true"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="power">powered by Logurean
+      <link rel="icon"  type="image/jpg" href="Logurean.jpg">
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      // topics array (id, title, text) - 100 items (elaborated)
+      const topics = [
+        { id: 't1',  title: 'The Magic of Music', text: "Music has a unique power to connect people across cultures and generations. It can lift the mood in an instant, trigger memories, and express emotions that are hard to put into words. Whether through rhythm, melody, or harmony, music shapes celebrations, comforts during hard times, and helps us reflect on personal experiences." },
+        { id: 't2',  title: 'Online vs Offline Learning', text: "Online learning offers flexibility, a wide range of resources, and opportunities for self-paced study, making education more accessible. Offline learning provides direct human interaction, immediate feedback, and hands-on experiences that build social skills and discipline. Combining both approaches often gives learners the best of structure and adaptability." },
+        { id: 't3',  title: 'A Life-Changing Experience', text: "A single experience—like volunteering, travel, or overcoming a challenge—can shift your perspective and priorities. These moments teach resilience, empathy, and often reveal strengths you didn't know you had. Reflecting on such events helps convert lessons into long-term personal growth." },
+        { id: 't4',  title: 'If I Had a Superpower', text: "Imagining a superpower reveals what we value most; many people choose healing, invisibility, or time travel as ways to help others or solve problems. The idea of healing, for example, speaks to compassion and the desire to ease suffering. Thinking through consequences helps ground the fantasy in responsibility and ethics." },
+        { id: 't5',  title: 'My Favourite Food', text: "Food often carries memories: a childhood snack, a family recipe, or a comfort dish on a rainy day. Describing your favourite food can include its flavors, textures, and the occasions when you eat it. Sharing why a dish matters reveals cultural connections and personal history." },
+        { id: 't6',  title: 'The Importance of Reading', text: "Reading expands vocabulary, improves focus, and opens doors to new ideas and perspectives. Books allow us to travel mentally, learn from experts, and build empathy by seeing the world through other people's eyes. Regular reading contributes to lifelong learning and critical thinking." },
+        { id: 't7',  title: 'The Future of Transportation', text: "Transportation is evolving with electric vehicles, shared mobility, and autonomous systems that promise cleaner, safer travel. Urban planning will need to adapt to reduce congestion and prioritize sustainable modes like cycling and public transit. The transition requires investment, smart regulation, and public acceptance." },
+        { id: 't8',  title: 'Traveling the World', text: "Travel broadens your understanding of cultures, cuisines, and ways of life that differ from your own. It develops adaptability, communication skills, and often leaves you with unforgettable memories and friendships. Responsible travel also respects local communities and the environment." },
+        { id: 't9',  title: 'Overcoming Fear', text: "Fear is a natural response that can protect or limit us depending on how we react. Confronting fears with small, repeated steps builds confidence and reduces anxiety over time. Learning strategies like breathing, preparation, and gradual exposure helps transform fear into manageable challenge." },
+        { id: 't10', title: 'My Favourite Hobby', text: "A hobby provides relaxation, creative expression, and a sense of accomplishment outside work or study. Whether it's painting, gardening, coding, or playing sports, hobbies foster skills and mental well-being. Sharing how you got started and what you enjoy can inspire others to try it too." },
+        { id: 't11', title: 'Role of Technology in Education', text: "Technology has made education more flexible and inclusive through online platforms, interactive tools, and access to global content. However, technology should support teachers and human interaction rather than replace them, ensuring equitable access and thoughtful pedagogy. Effective integration focuses on learning outcomes and digital literacy." },
+        { id: 't12', title: 'Why We Should Protect Wildlife', text: "Wildlife is essential to healthy ecosystems, providing services like pollination, pest control, and biodiversity that sustain human life. Protecting habitats and reducing human impact preserves these systems for future generations. Conservation also respects intrinsic value in other living beings and supports local communities dependent on natural resources." },
+        { id: 't13', title: 'A Memorable Teacher', text: "A memorable teacher often combines knowledge with empathy, inspiring curiosity and confidence in students. Their influence goes beyond academics, shaping values and work habits that last a lifetime. Remembering a teacher's specific act of encouragement highlights the power of mentorship." },
+        { id: 't14', title: 'The Internet — Blessing or Curse', text: "The internet connects people and information instantly, enabling collaboration, education, and commerce on a global scale. Yet it also amplifies misinformation, privacy risks, and addiction to screens. Responsible use, critical thinking, and regulation help maximize benefits while minimizing harms." },
+        { id: 't15', title: 'A Book That Changed Me', text: "A life-changing book challenges assumptions, introduces new philosophies, or models behavior that shifts your thinking. Discuss how the ideas affected your choices, actions, or outlook. Personal anecdotes about applying those lessons make the impact clear." },
+        { id: 't16', title: 'The Joy of Cooking', text: "Cooking combines creativity, science, and culture—it feeds both body and soul. Learning techniques and experimenting with flavors builds confidence and can bring people together. Sharing a favorite recipe or memory shows how food connects us." },
+        { id: 't17', title: 'City Life vs Village Life', text: "City life offers convenience, services, and diverse opportunities, while village life often provides close community ties and a slower pace. Each environment suits different priorities—career, family, peace, or social variety. Many people find a balance that incorporates benefits of both." },
+        { id: 't18', title: 'Importance of Sports', text: "Sports promote physical health, discipline, teamwork, and resilience. Participating builds social bonds and provides structured goals that improve focus and confidence. At the community level, sports events foster pride and shared identity." },
+        { id: 't19', title: 'Climate Change', text: "Climate change poses grave risks to ecosystems, food security, and coastal communities through rising temperatures and extreme weather. Addressing it requires coordinated global action on emissions, sustainable practices, and adaptation strategies. Individual choices, policy, and innovation must work together to limit harm." },
+        { id: 't20', title: 'The Best Invention', text: "Choosing the 'best' invention depends on the criteria—impact, accessibility, or transformative effect. Innovations like the printing press, electricity, and the internet have reshaped society in profound ways. Discussing an invention highlights how technology changes daily life and future possibilities." },
+        { id: 't21', title: 'The Value of Friendship', text: "Friendship provides emotional support, honest feedback, and companionship during life's ups and downs. Good friends encourage growth, celebrate successes, and help during setbacks. Investing time and trust in relationships leads to long-term wellbeing." },
+        { id: 't22', title: 'My Dream Job', text: "A dream job aligns personal strengths, values, and interests with meaningful work and growth opportunities. Describe the job's activities, impact, and daily environment to make the vision concrete. Planning steps and skills needed turns a dream into an achievable goal." },
+        { id: 't23', title: 'Lessons from Failure', text: "Failure is a powerful teacher that reveals weaknesses and uncovers paths for improvement. Embracing failure with reflection and adjustments turns setbacks into stepping stones. Sharing a specific failure and the lessons learned shows how resilience is built." },
+        { id: 't24', title: 'Social Media Impact', text: "Social media connects people and amplifies voices, but it can distort reality, foster comparison, and spread falsehoods. Thoughtful use, platform responsibility, and media literacy help harness its benefits. Setting boundaries preserves mental health and focus." },
+        { id: 't25', title: 'Time Management', text: "Time management is about prioritizing tasks that align with long-term goals and allocating energy effectively. Tools like calendars, task lists, and time-blocking reduce procrastination and increase productivity. Regular reviews help refine what matters most." },
+        { id: 't26', title: 'The Art of Listening', text: "Listening is an active skill that requires attention, empathy, and patience. Good listeners validate others, gather information, and reduce misunderstandings. Practicing reflective listening strengthens relationships and problem solving." },
+        { id: 't27', title: 'Importance of Sleep', text: "Sleep is essential for memory consolidation, emotional regulation, and physical recovery. Poor sleep harms concentration and long-term health, while consistent sleep routines improve performance. Prioritizing sleep is a key part of self-care." },
+        { id: 't28', title: 'The Power of Habit', text: "Habits shape daily behavior and compound into significant outcomes over time. Small, consistent routines are more effective than occasional intense efforts. Designing environments and triggers helps form positive habits and break negative ones." },
+        { id: 't29', title: 'Volunteering', text: "Volunteering benefits communities and gives volunteers perspective, skills, and social connection. It can range from local cleanup efforts to mentoring programs, each creating meaningful impact. Volunteering often leads to personal growth and stronger civic engagement." },
+        { id: 't30', title: 'Digital Privacy', text: "Digital privacy involves understanding how personal data is collected, stored, and used by services and platforms. Protecting privacy means using strong passwords, reviewing permissions, and being cautious with sharing sensitive information. Policy and user education are both crucial to safeguarding rights online." },
+        { id: 't31', title: 'A Day Without Technology', text: "A technology-free day encourages presence, direct conversation, and creativity without constant notifications. It can reduce stress and help you appreciate offline activities like walking, reading, or cooking. Planning such days occasionally improves balance and mental clarity." },
+        { id: 't32', title: 'Education vs Experience', text: "Formal education provides theoretical knowledge and foundational skills, while experience builds practical problem-solving and adaptability. Employers often value a combination: credentials plus demonstrated achievements. Lifelong learning blends both paths for career success." },
+        { id: 't33', title: 'Healthy Living', text: "Healthy living integrates balanced nutrition, regular physical activity, sufficient sleep, and mental wellness practices. Small, consistent habits like hydration, daily movement, and stress management add up. Prevention and routine care keep you energised and resilient." },
+        { id: 't34', title: 'Space Exploration', text: "Space exploration expands scientific knowledge and drives new technologies with broad benefits on Earth. Missions teach us about planetary systems, potential resources, and the origins of life. They also inspire generations and encourage international cooperation." },
+        { id: 't35', title: 'Cultural Diversity', text: "Cultural diversity brings different perspectives, traditions, and creative expressions that enrich communities and innovation. Embracing diversity requires respect, curiosity, and active inclusion. Learning about other cultures fosters empathy and better problem solving." },
+        { id: 't36', title: 'The Rise of Electric Vehicles', text: "Electric vehicles reduce tailpipe emissions and enable cleaner urban air when paired with renewable energy. They also shift automotive design toward silent, efficient propulsion and connected systems. Infrastructure, battery improvements, and policy support are vital for wide adoption." },
+        { id: 't37', title: 'Minimalism', text: "Minimalism focuses on owning fewer things that add real value, reducing clutter and stress. It encourages intentional choices about consumption, time, and commitments. The approach can lead to financial savings and a clearer sense of purpose." },
+        { id: 't38', title: 'Financial Literacy', text: "Financial literacy means understanding budgeting, saving, debt management, and basic investing to secure your future. Simple practices like tracking expenses and building an emergency fund create stability. Education early in life empowers better long-term financial choices." },
+        { id: 't39', title: 'The Future of Work', text: "The workplace is shifting with automation, remote collaboration, and a focus on human creative skills. Continuous learning, adaptability, and digital fluency will be central to career resilience. Employers and workers must invest in reskilling to meet changing demands." },
+        { id: 't40', title: 'Public Speaking Tips', text: "Effective public speaking combines preparation, storytelling, and audience awareness to communicate clearly. Practice, structured outlines, and controlling pacing reduce nerves. Engaging visuals and authentic delivery help messages stick." },
+        { id: 't41', title: 'The Magic of Cinema', text: "Cinema blends narrative, visuals, sound, and performance to create emotional experiences that reflect society and imagination. Films can entertain, educate, and challenge perspectives through powerful stories. Discussing a memorable scene reveals how filmmaking choices shape impact." },
+        { id: 't42', title: 'Learning a New Language', text: "Learning a language opens new cultural doors and improves cognitive flexibility. Consistent practice, immersive experiences, and conversational exchanges accelerate progress. Language learning also deepens appreciation for different worldviews." },
+        { id: 't43', title: 'The Beauty of Mathematics', text: "Mathematics uncovers patterns and fundamental relationships underlying nature and technology. Beyond calculations, math trains logical thinking and problem-solving applicable across domains. Sharing a simple real-world example illustrates its relevance." },
+        { id: 't44', title: 'The Science of Happiness', text: "Happiness research highlights relationships, meaningful work, gratitude, and health as key contributors to wellbeing. Small daily rituals—gratitude journals, acts of kindness, and social connection—support sustainable happiness. Understanding trade-offs helps set realistic expectations." },
+        { id: 't45', title: 'Artificial Intelligence', text: "AI automates repetitive tasks and enhances decision-making with data-driven insights, transforming industries from healthcare to transport. Responsible AI requires transparency, fairness, and safeguards against bias. Human oversight and ethical design ensure AI serves people." },
+        { id: 't46', title: 'The Role of Music in Movies', text: "Music supports film storytelling by shaping mood, signaling emotion, and reinforcing themes. A well-composed score can make scenes memorable and heighten audience engagement. Composers collaborate with directors to match music to narrative pace and tone." },
+        { id: 't47', title: 'The Importance of Recycling', text: "Recycling conserves resources, reduces landfill waste, and lowers the environmental cost of producing new materials. Effective recycling is coupled with reducing consumption and reusing items to maximize benefit. Clear labeling and consumer education improve outcomes." },
+        { id: 't48', title: 'Pets and Responsibility', text: "Caring for pets teaches commitment, routine, and empathy as you provide food, exercise, and healthcare. Pets offer companionship and can improve mental health, but they require long-term planning and responsible ownership. Adopting from shelters supports animal welfare." },
+        { id: 't49', title: 'The Power of Positive Thinking', text: "Positive thinking reframes obstacles as opportunities and encourages constructive action rather than paralysis. Optimism improves motivation, problem-solving, and stress resilience while remaining realistic about challenges. Balancing positivity with practical planning yields the best results." },
+        { id: 't50', title: 'Art in Everyday Life', text: "Art enhances daily surroundings, invites reflection, and encourages creative problem solving beyond formal galleries. Incorporating small creative acts—sketching, photography, or design—stimulates curiosity and wellbeing. Art also preserves cultural memory and personal expression." },
+        { id: 't51', title: 'The Joy of Gardening', text: "Gardening connects you to nature, teaches patience, and rewards with fresh produce or beautiful plants. It supports mental health through outdoor activity and sensory engagement. Even small spaces like balconies can host thriving gardens with the right care." },
+        { id: 't52', title: 'How to Stay Motivated', text: "Motivation often comes from clear goals, a sense of progress, and supportive peers or mentors. Breaking tasks into manageable steps and celebrating small wins keeps momentum. Reassessing purpose and mixing routines with novelty prevents burnout." },
+        { id: 't53', title: 'The Impact of Tourism', text: "Tourism brings economic benefits and cultural exchange but can strain local resources and environments if unmanaged. Sustainable tourism balances visitor experiences with protection of heritage and ecosystems. Community involvement ensures tourism supports local wellbeing." },
+        { id: 't54', title: 'Celebrations and Festivals', text: "Festivals and celebrations reinforce cultural identity, family bonds, and shared values through music, food, and ritual. They create continuity between generations and offer chances for communal joy. Respecting origins and inclusive practices keeps traditions meaningful." },
+        { id: 't55', title: 'The Story of My Name', text: "Names carry family, cultural, or historical significance that can shape identity and belonging. Exploring its origin can reveal stories of ancestors, migrations, or values your family holds dear. Sharing why your name matters creates a personal connection." },
+        { id: 't56', title: 'My First Day at School', text: "The first day at school is often filled with nerves, curiosity, and new friendships that can last years. It marks a milestone in independence and social development, shaping early learning habits. Recounting a memory from that day reveals formative moments and emotions." },
+        { id: 't57', title: 'The Importance of Manners', text: "Manners smooth social interactions and show respect, helping build trust and positive impressions. Simple acts like listening, saying thank you, and punctuality create more pleasant communities. Teaching manners emphasizes empathy and consideration for others." },
+        { id: 't58', title: 'Leadership Qualities', text: "Effective leaders combine vision, empathy, decisiveness, and the ability to inspire others. Leadership is service-oriented; it involves empowering teams, accepting responsibility, and learning from mistakes. Developing these qualities requires self-awareness and practice." },
+        { id: 't59', title: 'The Psychology of Color', text: "Color influences mood, perception, and behavior; designers use color to convey brand identity and emotion. Warm colors can energize while cool tones calm; cultural context also changes meaning. Thoughtful color choices improve communication and user experience." },
+        { id: 't60', title: 'The Future of Food', text: "Food systems are evolving with alternatives like plant-based and lab-grown proteins to meet sustainability and health goals. Innovations in agriculture, supply chains, and waste reduction aim to feed a growing population responsibly. Consumer preferences and policy will shape how food systems adapt." },
+        { id: 't61', title: 'Persistence vs Talent', text: "Talent provides a head start, but persistence and deliberate practice often determine long-term success. Consistent effort, feedback, and resilience help learners progress faster than relying on innate ability alone. Stories of gradual improvement highlight the power of grit." },
+        { id: 't62', title: 'The Influence of Role Models', text: "Role models provide behavior blueprints and motivation, especially for young people forming aspirations. Choose role models for their values and actions, not just fame. Reflecting on what you admire helps form a plan to emulate positive traits." },
+        { id: 't63', title: 'How to Learn Faster', text: "Effective learning uses active recall, spaced repetition, and teaching others to cement knowledge. Breaking material into chunks and practicing retrieval improves retention. Regular review and varied contexts help move knowledge into long-term memory." },
+        { id: 't64', title: 'Low-Waste Living', text: "Low-waste living reduces environmental impact by prioritizing reusable, repairable, and recyclable choices. Simple habits—carrying a water bottle, avoiding single-use plastics, and composting—add up. Mindful consumption encourages better product design and community initiatives." },
+        { id: 't65', title: 'The Magic of Sunsets', text: "Sunsets are simple daily events that invite pause and gratitude through striking colors and shifting light. Observing them encourages reflection and offers a natural reset after a busy day. Photographs or quiet moments can capture their calm and inspiration." },
+        { id: 't66', title: 'The Science Behind Dreams', text: "Dreams combine memory processing and emotional regulation during sleep, sometimes inspiring creativity or problem-solving. While interpretations vary, studying dreams reveals how the brain consolidates experiences. Lucid dreaming and journals can enhance self-discovery." },
+        { id: 't67', title: 'The Importance of Voting', text: "Voting is a fundamental civic duty that shapes laws, services, and leaders affecting everyday life. Participation ensures diverse voices influence public decisions and accountability. Learning about candidates and issues leads to informed voting and stronger democracies." },
+        { id: 't68', title: 'Traditions in My Family', text: "Family traditions provide continuity, identity, and shared rituals that create lasting memories. They can be seasonal meals, storytelling, or certain celebrations that pass values between generations. Reflecting on a tradition reveals what your family cherishes." },
+        { id: 't69', title: 'The Wonders of the Ocean', text: "Oceans host vast biodiversity, regulate climate, and support global food systems, yet face threats from pollution and overfishing. Protecting marine environments preserves species and livelihoods and maintains Earth's health. Sustainable policies and personal choices help safeguard the seas." },
+        { id: 't70', title: 'Smart Cities and Urban Planning', text: "Smart cities leverage data, sensors, and design to optimize transport, energy, and services for better quality of life. Urban planning that prioritizes walkability, green spaces, and mixed use reduces commute times and pollution. Community input ensures developments serve residents' needs." },
+        { id: 't71', title: 'The Role of Libraries', text: "Libraries provide free access to information, learning resources, and safe community spaces for people of all ages. Modern libraries also offer digital services, workshops, and support for literacy and job searching. They are hubs for lifelong learning and civic engagement." },
+        { id: 't72', title: 'The Evolution of Mobile Phones', text: "Mobile phones have transformed from simple communication devices to powerful pocket computers that shape social life and work. They enable instant information, navigation, and creative tools, but also create challenges around attention and privacy. Thoughtful usage balances convenience with wellbeing." },
+        { id: 't73', title: 'The Ethics of Cloning', text: "Cloning presents ethical questions about identity, biodiversity, and the consequences of replicating organisms. Debate includes potential benefits—like preserving endangered species—and risks such as reduced genetic diversity. Ethical frameworks are needed to guide scientific progress responsibly." },
+        { id: 't74', title: 'The Power of Storytelling', text: "Storytelling communicates complex ideas through emotion and narrative, making information memorable and persuasive. Stories build empathy by placing listeners in another person's shoes and connect facts to human experience. Crafting a clear beginning, middle, and end strengthens any message." },
+        { id: 't75', title: 'How to Handle Criticism', text: "Handling criticism constructively involves listening, separating useful feedback from noise, and asking clarifying questions. Treat feedback as data for improvement, not a personal attack, and apply changes that align with your goals. Responding calmly maintains relationships and growth." },
+        { id: 't76', title: 'Benefits of Meditation', text: "Meditation reduces stress, improves focus, and increases emotional regulation when practiced regularly. Even short daily sessions can build resilience and clarity of mind. Combining meditation with movement and good sleep amplifies mental wellbeing." },
+        { id: 't77', title: 'The Charm of Handwritten Letters', text: "Handwritten letters convey personal attention and thoughtfulness in a way digital messages rarely match. They create tangible keepsakes and deepen emotional connection through careful phrasing and penmanship. Writing letters encourages reflection and slows communication to meaningful content." },
+        { id: 't78', title: 'My Favourite Childhood Game', text: "Childhood games teach cooperation, imagination, and social rules through play. Describing a favourite game reveals how you learned to negotiate, lead, or follow, and often carries nostalgic warmth. Play remains important for creativity at any age." },
+        { id: 't79', title: 'The Importance of Goal Setting', text: "Setting clear, measurable goals turns vague intentions into actionable plans and tracks progress. Breaking goals into milestones and scheduling checkpoints keeps motivation high. Regularly reviewing and adjusting goals ensures relevance and momentum." },
+        { id: 't80', title: 'Challenges of Remote Work', text: "Remote work offers flexibility and reduced commuting but also blurs work-life boundaries and can cause isolation. Clear routines, dedicated workspaces, and regular social contact help maintain productivity and wellbeing. Employers should support remote teams with communication and mental health resources." },
+        { id: 't81', title: 'The Magic of First Impressions', text: "First impressions shape initial trust and influence how relationships develop, combining nonverbal cues, tone, and authenticity. Being punctual, attentive, and respectful helps create a positive start. Yet, allowing time to reassess prevents snap judgments from becoming permanent labels." },
+        { id: 't82', title: 'The Future of Sports', text: "Sports will increasingly incorporate data analytics, wearable tech, and virtual experiences to enhance performance and fan engagement. New formats and accessibility initiatives can broaden participation and inclusivity. Maintaining fairness and athlete welfare must remain central as technology advances." },
+        { id: 't83', title: 'The Impact of Music on Mood', text: "Music affects emotion through tempo, rhythm, and harmony; it can energize workouts, soothe stress, or aid concentration. Curating playlists with intent helps manage mood and productivity. Exploring why certain songs affect you deepens self-awareness." },
+        { id: 't84', title: 'The Role of Women in Society', text: "Women contribute across every sector—leadership, science, arts, and family—and achieving gender equality unlocks social and economic benefits. Supporting education, fair policies, and representation enables talent to flourish. Highlighting role models helps inspire the next generation." },
+        { id: 't85', title: 'The Importance of Clean Water', text: "Access to clean water is essential for health, sanitation, and agriculture, yet many communities still lack reliable supply. Investment in infrastructure, pollution control, and efficient use protects this vital resource. Water stewardship safeguards lives and livelihoods." },
+        { id: 't86', title: 'The Science of Cooking', text: "Cooking is a blend of chemistry, heat, and technique—understanding reactions like caramelization and emulsification improves results. Precision with temperature and timing turns basic ingredients into consistent dishes. Experimentation, practice, and tasting are key to culinary skill." },
+        { id: 't87', title: 'The Beauty of Simple Code', text: "Simple code is readable, maintainable, and easier to test—qualities that reduce bugs and speed development. Clear naming, small functions, and comments where needed beat clever one-liners when collaborating. Prioritizing simplicity increases long-term project health." },
+        { id: 't88', title: 'The Value of Time', text: "Time is finite and prioritizing it means aligning daily actions with meaningful goals and relationships. Using time intentionally—through routines, limits, and focus—creates space for rest and growth. Regularly auditing time use reveals opportunities for improvement." },
+        { id: 't89', title: 'The Art of Negotiation', text: "Successful negotiation focuses on mutual gains, preparation, and clear communication of interests rather than positions. Building rapport and exploring options creates value for both sides. Knowing your goals and limits helps reach durable agreements." },
+        { id: 't90', title: 'Lessons from Traveling Alone', text: "Solo travel builds confidence, self-reliance, and the ability to connect with strangers and new places. It forces you to handle logistics and unexpected situations, sharpening problem-solving skills. The experience often leads to deeper cultural immersion and personal discovery." },
+        { id: 't91', title: 'Future Trends in EdTech', text: "EdTech will personalize learning with adaptive systems, use AI to support teachers, and expand access globally. Ethical use of data and focus on pedagogy will determine real educational gains. Collaboration between educators and technologists ensures useful, scalable tools." },
+        { id: 't92', title: 'Cinema as a Tool for Social Change', text: "Films can highlight injustice, humanize marginalized voices, and spark public debate by telling compelling stories. Documentary and narrative cinema both influence awareness and policy when paired with outreach. Filmmakers have a responsibility to balance storytelling with factual integrity." },
+        { id: 't93', title: 'How to Build Confidence', text: "Confidence grows from competence—practice, small challenges, and honest feedback build self-efficacy. Positive self-talk, body language, and celebrating progress also reinforce belief in abilities. Setting achievable goals creates a track record to rely on." },
+        { id: 't94', title: 'The Importance of Emotional Intelligence', text: "Emotional intelligence enables better relationships through self-awareness, regulation, empathy, and social skills. It improves teamwork, leadership, and conflict resolution by prioritizing understanding. Developing EQ involves reflection, feedback, and practice." },
+        { id: 't95', title: 'The Story Behind a Photograph', text: "Every photograph has context: the moment, the emotion, and the choices behind framing and timing. Sharing that story connects viewers to the image and deepens appreciation. Photography can document change, preserve memory, and tell human stories." },
+        { id: 't96', title: 'The Power of Teamwork', text: "Teams combine diverse skills to solve complex problems faster than individuals working alone. Clear roles, trust, and communication are the foundation of high-performing teams. Celebrating shared wins and learning from setbacks strengthens collaboration." },
+        { id: 't97', title: 'Simple Ways to Help the Environment', text: "Small daily actions—reducing single-use plastics, conserving energy, and supporting local produce—collectively make a difference. Volunteering for cleanups and advocating for policy change amplifies impact. Consistency matters more than perfection." },
+        { id: 't98', title: 'The Impact of Globalization', text: "Globalization connects economies and cultures, creating opportunities for trade and exchange while also raising challenges like inequality and cultural erosion. Policies that ensure fair labor standards and cultural preservation help mitigate downsides. Individuals can engage globally while supporting local resilience." },
+        { id: 't99', title: 'The Importance of Humor', text: "Humor eases tension, strengthens relationships, and provides perspective in difficult situations. Shared laughter builds bonds and can be a powerful tool for communication when used sensitively. Balancing wit with empathy keeps humor inclusive." },
+        { id: 't100', title: 'My Vision for the Future', text: "A hopeful vision combines practical goals—sustainable communities, equitable education, and technological stewardship—with values like empathy and collaboration. Articulating a concrete plan and small steps helps turn vision into action. Collective effort and patience are required to build a better future." }
+      ];
+
+      const scriptsList = document.getElementById('scriptsList');
+      const searchInput = document.getElementById('searchInput');
+      const topicTitle = document.getElementById('topicTitle');
+      const scriptContent = document.getElementById('scriptContent');
+      const startBtn = document.getElementById('startTimerBtn');
+      const countdown = document.getElementById('countdown');
+
+      // populate list
+      function renderList(items) {
+        scriptsList.innerHTML = items.map(t => `<li data-id="${t.id}" tabindex="0">${t.title}</li>`).join('');
+      }
+      renderList(topics);
+
+      // filter
+      searchInput.addEventListener('input', () => {
+        const q = searchInput.value.trim().toLowerCase();
+        const filtered = topics.filter(t => t.title.toLowerCase().includes(q) || t.text.toLowerCase().includes(q));
+        renderList(filtered);
+      });
+
+      // click to show topic (event delegation)
+      scriptsList.addEventListener('click', (e) => {
+        const li = e.target.closest('li');
+        if (!li) return;
+        const id = li.dataset.id;
+        const topic = topics.find(t => t.id === id);
+        if (!topic) return;
+        topicTitle.textContent = topic.title;
+        scriptContent.textContent = topic.text;
+        countdown.textContent = '';
+      });
+
+      // keyboard activation
+      scriptsList.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.target.click();
+        }
+      });
+
+      // 1-minute timer
+      let timerId = null;
+      startBtn.addEventListener('click', () => {
+        if (timerId) { clearInterval(timerId); timerId = null; startBtn.disabled = false; countdown.textContent = ''; return; }
+        let timeLeft = 60;
+        startBtn.disabled = true;
+        countdown.textContent = `Time left: ${timeLeft} seconds`;
+        timerId = setInterval(() => {
+          timeLeft -= 1;
+          if (timeLeft > 0) {
+            countdown.textContent = `Time left: ${timeLeft} seconds`;
+          } else {
+            clearInterval(timerId);
+            timerId = null;
+            countdown.textContent = "Time's up!";
+            startBtn.disabled = false;
+          }
+        }, 1000);
+      });
+
+    })();
+  </script>
+</body>
+</html>
